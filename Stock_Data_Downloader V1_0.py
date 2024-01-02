@@ -11,8 +11,6 @@ The data is stored in the 'Yahoo_Data' table within the 'Stock_Data' DB.
 
 # Import packages
 import pandas as pd
-import numpy as np
-import requests
 from urllib.request import urlretrieve
 import sqlite3
 import time
