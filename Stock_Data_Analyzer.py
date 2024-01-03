@@ -95,11 +95,11 @@ def read_days_integer_input():
 
 '''
 Function: plot_ticker_volume
-Inputs: stock ticker
+Inputs: stock ticker, number of days to graph
 Outputs: None
 Description: plots stock ticker volume over a given time window and displays it using matplotlib
 '''
-def plot_ticker_volume(stock_ticker):
+def plot_ticker_volume(stock_ticker, num_days):
     sql_string = "SELECT DATE, VOLUME FROM Yahoo_Data WHERE Ticker = '" + stock_ticker + "' ORDER BY DATE DESC LIMIT " + str(num_days)
     stock_data = pd.read_sql(sql_string, conx)  # read volume and date from 'Yahoo Data'
     date_data = stock_data.iloc[:, 0]  # slice the data for plotting
@@ -124,12 +124,14 @@ def plot_ticker_volume(stock_ticker):
 
 '''
 Function: download_stock_data
-Inputs: stock ticker
-Outputs: None
+Inputs: stock ticker, number of days to download
+Outputs: ticker_is_valid (flag indicating whether the download was successful)
 Description: Creates a Yahoo Finance URL and downloads the requested stock data into a dataframe. The data is stored
 in the Yahoo_Data table
 '''
-def download_stock_data(stock_ticker):
+def download_stock_data(stock_ticker, num_days):
+
+    ticker_is_valid = False  # flag indicating whether the Yahoo Link worked
 
     period_2 = int(time.time())  # fetch today's date for calculating Yahoo Finance Unix time stamp
     period_1 = period_2 - num_days * 86400  # calculate start of period in Unix
@@ -146,9 +148,11 @@ def download_stock_data(stock_ticker):
         if e.code == 404:
             # ticker does not exist on Yahoo Finance
             print('Error: Invalid ticker entered')
+            return ticker_is_valid
     except urllib.error.URLError as e:
         # a different connection error has occurred
         print('A connection error has occurred')
+        return ticker_is_valid
     else:
         # ticker is valid
         conn.close()  # close the previously opened connection
@@ -164,6 +168,8 @@ def download_stock_data(stock_ticker):
 
         merged_data.to_sql('Yahoo_Data', conx, if_exists='replace', index=False)  # insert DF into the Yahoo Data table
         print('Stock data imported successfully!')
+        ticker_is_valid = True
+        return ticker_is_valid
 
 
 conx = sqlite3.connect("Stock_Data.db")  # create database connection engine to DB saved in project directory
@@ -176,13 +182,14 @@ while 1:
 
     user_selection = read_menu_input()  # read ticker, time period, and the type of analysis to be performed
     Yahoo_Ticker = input('Enter a Yahoo Finance stock ticker in all caps with No $ symbol: ')
-    num_days = read_period_input()
-    download_stock_data(Yahoo_Ticker)
+    days = read_period_input()
+    valid_ticker = download_stock_data(Yahoo_Ticker, days)
 
-    # Perform requested analysis
-    if user_selection == 1:
-        plot_ticker_volume(Yahoo_Ticker)
-    elif user_selection == 2:
-        print('2 selected')
-    else:
-        print('3 selected')
+    if valid_ticker:
+        # Perform requested analysis
+        if user_selection == 1:
+            plot_ticker_volume(Yahoo_Ticker, days)
+        elif user_selection == 2:
+            print('2 selected')
+        else:
+            print('3 selected')
