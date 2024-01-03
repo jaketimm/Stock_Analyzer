@@ -5,7 +5,6 @@ Stock Data Downloader: V1.0
 
 Stock Data Analyzer: unstarted
 #### Current Revision Description:
-**Stock Data Downloader**: Downloads 1-365 days of Yahoo Finance Data for a requested stock ticker and stores it in a local database.
-Duplicate datapoints are removed if data downloads overlap with the existing saved data.
+**Stock Data Analyzer**: The user provides a Yahoo Finance stock ticker symbol, the number of trading days, and selects the type of analysis to perform. The data is downloaded from Yahoo Finance, stored in a local database, and analyzed.
 
-**Stock Data Analyzer**: Analysis tools are WIP
+**Stock Data Downloader**: Stand-alone data downloader. Downloads 1-365 days of Yahoo Finance Data for a requested stock ticker and stores it in a local database.
