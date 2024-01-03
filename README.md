@@ -1,9 +1,7 @@
 # Stock_Analyzer Tools
 Stock Tracker Python Codebase 
 ### Current Revision:
-Stock Data Downloader: V1.0
-
-Stock Data Analyzer: unstarted
+V1.0
 #### Current Revision Description:
 **Stock Data Analyzer**: The user provides a Yahoo Finance stock ticker symbol, the number of trading days, and selects the type of analysis to perform. The data is downloaded from Yahoo Finance, stored in a local database, and analyzed.
 
