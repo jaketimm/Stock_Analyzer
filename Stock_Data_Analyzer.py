@@ -22,8 +22,8 @@ Outputs: An integer representing which type of analysis to perform
 Description: Takes a user input from the console window and returns an integer 
 '''
 def read_menu_input():
-    valid_input = False  # input flag
 
+    valid_input = False  # input flag
     while not valid_input:
 
         user_input = read_analysis_integer_input()
@@ -42,6 +42,7 @@ Outputs: a valid integer input
 Description: collects an integer from the console window
 '''
 def read_analysis_integer_input():
+
     number_as_integer = None
     while number_as_integer is None:
         try:
@@ -63,8 +64,8 @@ Outputs: number of days of trading data to download
 Description: Takes a user input from the console window and returns the number of trading days to download
 '''
 def read_period_input():
-    valid_input = False  # input flag
 
+    valid_input = False  # input flag
     while not valid_input:
 
         user_input = read_days_integer_input()
@@ -83,6 +84,7 @@ Outputs: a valid integer input
 Description: collects an integer from the console window
 '''
 def read_days_integer_input():
+
     number_as_integer = None
     while number_as_integer is None:
         try:
@@ -100,6 +102,7 @@ Outputs: None
 Description: plots stock ticker volume and price over a given time window and displays it using matplotlib
 '''
 def plot_ticker_volume(stock_ticker, num_days):
+
     sql_string = "SELECT DATE, VOLUME, CLOSE FROM Yahoo_Data WHERE Ticker = '" + stock_ticker + "' ORDER BY DATE DESC LIMIT " + str(num_days)
     stock_data = pd.read_sql(sql_string, conx)  # read volume and date from 'Yahoo Data'
     stock_data = stock_data[::-1]  # reverse data
@@ -113,7 +116,7 @@ def plot_ticker_volume(stock_ticker, num_days):
     ax1.plot(date_data, volume_data, color='blue')
     ax2.plot(date_data, price_data, color='black', linestyle='dashed')
 
-    ax1.set_ylabel('Volume in millions')
+    ax1.set_ylabel('Volume in millions', color='blue')
     ax1.set_xlabel('Date')
     ax2.set_ylabel('Price ($)', color='black')
 
@@ -129,6 +132,47 @@ def plot_ticker_volume(stock_ticker, num_days):
     fig.legend(['Volume', 'Price'])
     ax1.grid('True')  # add grid lines
     mplot.show()
+
+
+'''
+Function: plot_ticker_volume
+Inputs: stock ticker, number of days to graph
+Outputs: None
+Description: plots stock ticker volume and price over a given time window and displays it using matplotlib
+'''
+def plot_open_close_variation(stock_ticker, num_days):
+
+    sql_string = "SELECT DATE, OPEN, CLOSE FROM Yahoo_Data WHERE Ticker = '" + stock_ticker + "' ORDER BY DATE DESC LIMIT " + str(num_days)
+    stock_data = pd.read_sql(sql_string, conx)  # read volume and date from 'Yahoo Data'
+    stock_data = stock_data[::-1]  # reverse data
+    date_data = stock_data.iloc[:, 0]  # slice data
+    open_prices = stock_data.iloc[:, 1]
+    close_prices = stock_data.iloc[:, 2]
+
+    open_close_variation = close_prices - open_prices
+
+    fig, ax1 = mplot.subplots(figsize=(8, 8))  # create a subplot and add labels and colors
+    ax2 = ax1.twinx()
+    ax1.plot(date_data, open_close_variation, color='blue')
+    ax2.plot(date_data, close_prices, color='black', linestyle='dashed')
+
+    ax1.set_ylabel('Closing Price minus Opening Price ($)', color='blue')
+    ax1.set_xlabel('Date')
+    ax2.set_ylabel('Closing Price ($)', color='black')
+
+    if 10 <= num_days <= 30:  # rotate x-axis date text based on how crowded the graph is
+        ax1.tick_params(rotation=45)
+    elif num_days > 30:
+        ax1.tick_params(rotation=45)
+        ax1.set_xticks(ax1.get_xticks()[::5])  # display every 5th trading day on x-axis
+    else:
+        ax1.tick_params(rotation=0)
+
+    mplot.title('$' + stock_ticker + ' Open-Close Variation and Price By Date')
+    fig.legend(['Closing Minus Opening Price', 'Closing Price'])
+    ax1.grid('True')  # add grid lines
+    mplot.show()
+
 
 
 '''
@@ -199,6 +243,6 @@ while 1:
         if user_selection == 1:
             plot_ticker_volume(Yahoo_Ticker, days)
         elif user_selection == 2:
-            print('2 selected')
+            plot_open_close_variation(Yahoo_Ticker, days)
         else:
             print('3 selected')
