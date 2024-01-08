@@ -5,7 +5,7 @@ Stock Tracker Python Codebase Rev 1.0
 
 **Stock Data Downloader**: Stand-alone data downloader. The user provides the Yahoo Finance stock ticker and the number of trading days. The data is downloaded and stored in a local database.
 
-### **Sample Plots:**
+## **Sample Plots:**
 ![MSFT_Plot_Volume](https://github.com/jaketimm/Stock_Analyzer/assets/154553278/330db557-4f70-4fd2-ae6c-8121c8bc36c3)
 
 ## **Technologies Used:**
