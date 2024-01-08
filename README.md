@@ -14,4 +14,4 @@ Stock Tracker Python Codebase Rev 1.0
 - The pandas package is used for storing trading data and import/export from the SQL database
 - The sqlite3 package is used for creating a database connection engine and cursor
 - The matplotlib package is used for all figure creation
-- 
+
