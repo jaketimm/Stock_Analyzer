@@ -8,4 +8,5 @@ V1.0
 **Stock Data Downloader**: Stand-alone data downloader. Downloads 1-365 days of Yahoo Finance Data for a requested stock ticker and stores it in a local database.
 
 ### **Sample Plots**
-![MSFT_Plot](https://github.com/jaketimm/Stock_Analyzer/assets/154553278/0bbedf47-64fd-48bc-9b27-38a4d0e7c780)
+![MSFT_Plot_Volume](https://github.com/jaketimm/Stock_Analyzer/assets/154553278/330db557-4f70-4fd2-ae6c-8121c8bc36c3)
+
