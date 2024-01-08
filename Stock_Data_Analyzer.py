@@ -97,35 +97,37 @@ def read_days_integer_input():
 Function: plot_ticker_volume
 Inputs: stock ticker, number of days to graph
 Outputs: None
-Description: plots stock ticker volume over a given time window and displays it using matplotlib
+Description: plots stock ticker volume and price over a given time window and displays it using matplotlib
 '''
 def plot_ticker_volume(stock_ticker, num_days):
     sql_string = "SELECT DATE, VOLUME, CLOSE FROM Yahoo_Data WHERE Ticker = '" + stock_ticker + "' ORDER BY DATE DESC LIMIT " + str(num_days)
     stock_data = pd.read_sql(sql_string, conx)  # read volume and date from 'Yahoo Data'
     stock_data = stock_data[::-1]  # reverse data
-    date_data = stock_data.iloc[:, 0]  # slice the data for plotting
+    date_data = stock_data.iloc[:, 0]  # slice data
     volume_data = stock_data.iloc[:, 1]
     volume_data = volume_data / 1000000  # display volume in millions
-    price_data = stock_data.iloc[:, 2]  # slice the closing price
+    price_data = stock_data.iloc[:, 2]  # closing price
 
-    fig, ax1 = mplot.subplots(figsize=(8, 8))
+    fig, ax1 = mplot.subplots(figsize=(8, 8))  # create a subplot and add labels and colors
     ax2 = ax1.twinx()
     ax1.plot(date_data, volume_data, color='blue')
     ax2.plot(date_data, price_data, color='black', linestyle='dashed')
 
-    ax1.set_ylabel('Volume in millions', color='blue')
+    ax1.set_ylabel('Volume in millions')
     ax1.set_xlabel('Date')
     ax2.set_ylabel('Price ($)', color='black')
 
-    if 10 <= num_days <= 30:  # rotate date text based on how crowded the graph is
+    if 10 <= num_days <= 30:  # rotate x-axis date text based on how crowded the graph is
         ax1.tick_params(rotation=45)
     elif num_days > 30:
-        ax1.tick_params(rotation=90)
+        ax1.tick_params(rotation=45)
+        ax1.set_xticks(ax1.get_xticks()[::5])  # display every 5th trading day on x-axis
     else:
         ax1.tick_params(rotation=0)
 
     mplot.title('$' + stock_ticker + ' Volume and Price By Date')
     fig.legend(['Volume', 'Price'])
+    ax1.grid('True')  # add grid lines
     mplot.show()
 
 
@@ -157,7 +159,7 @@ def download_stock_data(stock_ticker, num_days):
             print('Error: Invalid ticker entered')
             return successful_download
     except urllib.error.URLError as e:
-        # a different connection error has occurred
+        # a different connection error occurred e.g. no internet
         print('A connection error has occurred')
         return successful_download
     else:
@@ -190,7 +192,7 @@ while 1:
     user_selection = read_menu_input()  # read ticker, time period, and the type of analysis to be performed
     Yahoo_Ticker = input('Enter a Yahoo Finance stock ticker in all caps with No $ symbol: ')
     days = read_period_input()
-    successful_download = download_stock_data(Yahoo_Ticker, days)
+    successful_download = download_stock_data(Yahoo_Ticker, days)  # download data and return status flag
 
     if successful_download:
         # Perform requested analysis
