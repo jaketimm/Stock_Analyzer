@@ -135,10 +135,10 @@ def plot_ticker_volume(stock_ticker, num_days):
 
 
 '''
-Function: plot_ticker_volume
+Function: plot_open_close_variation
 Inputs: stock ticker, number of days to graph
 Outputs: None
-Description: plots stock ticker volume and price over a given time window and displays it using matplotlib
+Description: plots closing minus opening price and displays it with the closing price
 '''
 def plot_open_close_variation(stock_ticker, num_days):
 
@@ -173,6 +173,58 @@ def plot_open_close_variation(stock_ticker, num_days):
     ax1.grid('True')  # add grid lines
     mplot.show()
 
+
+'''
+Function: plot_day_vs_overnight_moves
+Inputs: stock ticker, number of days to graph
+Outputs: None
+Description: plots stock intraday vs overnight movement and displays it with the closing price
+'''
+def plot_day_vs_overnight_moves(stock_ticker, num_days):
+
+    sql_string = "SELECT DATE, OPEN, CLOSE FROM Yahoo_Data WHERE Ticker = '" + stock_ticker + "' ORDER BY DATE DESC LIMIT " + str(num_days)
+    stock_data = pd.read_sql(sql_string, conx)  # read volume and date from 'Yahoo Data'
+    stock_data = stock_data[::-1]  # reverse data
+    date_data = stock_data.iloc[:, 0]  # slice data
+    open_prices = stock_data.iloc[:, 1]
+    close_prices = stock_data.iloc[:, 2]
+
+    overnight_move = []  # create placeholder lists
+    intraday_move = []
+
+    for i in range(num_days):
+
+        if i == 0:  # skip day 1 as it can't be plotted
+            i = 1
+        else:
+            overnight_move.append(open_prices[i] - close_prices[i - 1])  # open minus previous day's close
+            intraday_move.append(close_prices[i] - open_prices[i])  # same day change during trading hours
+
+    date_data = date_data[1:num_days]  # remove first day of data as there is no overnight move
+    close_prices = close_prices[1:num_days]
+
+    fig, ax1 = mplot.subplots(figsize=(8, 8))  # create a subplot and add labels and colors
+    ax2 = ax1.twinx()
+    ax1.plot(date_data, overnight_move, color='blue')
+    ax1.plot(date_data, intraday_move, color='orange')
+    ax2.plot(date_data, close_prices, color='black', linestyle='dashed')
+
+    ax1.set_ylabel('Change in Price ($)', color='black')
+    ax1.set_xlabel('Date')
+    ax2.set_ylabel('Closing Price ($)', color='black')
+
+    if 10 <= num_days <= 30:  # rotate x-axis date text based on how crowded the graph is
+        ax1.tick_params(rotation=45)
+    elif num_days > 30:
+        ax1.tick_params(rotation=45)
+        ax1.set_xticks(ax1.get_xticks()[::5])  # display every 5th trading day on x-axis
+    else:
+        ax1.tick_params(rotation=0)
+
+    mplot.title('$' + stock_ticker + ' Overnight Change, Intraday Change, and Price By Date')
+    fig.legend(['Overnight Move', 'Intraday Move', 'Closing Price'])
+    ax1.grid('True')  # add grid lines
+    mplot.show()
 
 
 '''
@@ -245,4 +297,4 @@ while 1:
         elif user_selection == 2:
             plot_open_close_variation(Yahoo_Ticker, days)
         else:
-            print('3 selected')
+            plot_day_vs_overnight_moves(Yahoo_Ticker, days)
